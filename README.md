@@ -71,3 +71,16 @@ The goal is simple:
 **Cloud & Deployment**
 - AWS / Azure – Hosting & cloud services
 - Cloud Storage – Documents & reports
+
+> **How does choosing between static, dynamic, and hybrid rendering affect performance, scalability, and data freshness?**
+- Static Rendering maximizes speed and scalability but sacrifices freshness.
+- Dynamic Rendering guarantees fresh data but increases server cost and latency.
+- Hybrid Rendering provides the best balance by serving static pages that regenerate periodically.
+
+By mixing these strategies page-by-page, a Next.js app can:
+
+- Load faster
+- Scale efficiently
+- Keep critical data fresh
+
+This approach reflects real-world production decision-making, not just implementation knowledge.
