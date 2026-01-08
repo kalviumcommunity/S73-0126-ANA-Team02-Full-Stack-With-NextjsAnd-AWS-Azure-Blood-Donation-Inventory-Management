@@ -72,6 +72,20 @@ The goal is simple:
 - AWS / Azure – Hosting & cloud services
 - Cloud Storage – Documents & reports
 
+## Deployment
+
+This project is production-ready with CI/CD and containerization:
+
+- CI workflow builds on push to main: see [\.github/workflows/ci.yml](.github/workflows/ci.yml). It installs dependencies, lints, and performs a production build using GitHub Secrets (no hardcoded secrets).
+- Docker image build workflow: see [\.github/workflows/docker-build.yml](.github/workflows/docker-build.yml). It builds a Docker image from the repository Dockerfile.
+- Local container run: see [docs/docker-quickstart.md](docs/docker-quickstart.md) for step-by-step `docker build` and `docker run` instructions.
+
+### Environment & Secrets
+
+- Only the template [\.env.example](.env.example) is committed. Real env files are ignored via [\.gitignore](.gitignore).
+- Public variables (e.g., `NEXT_PUBLIC_API_URL`) can be exposed to the client; private variables (e.g., `DATABASE_URL`) must only be read server-side. See usage helpers in [src/lib/env.ts](src/lib/env.ts).
+- In CI and Docker, provide secrets via environment injection (GitHub Secrets / `docker run -e`)—never hardcode secrets in source.
+
 > **How does choosing between static, dynamic, and hybrid rendering affect performance, scalability, and data freshness?**
 - Static Rendering maximizes speed and scalability but sacrifices freshness.
 - Dynamic Rendering guarantees fresh data but increases server cost and latency.
