@@ -1,0 +1,17 @@
+/* Global styles applied to every page via RootLayout. */
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  padding: 2rem;
+  background: #f7f9fc;
+  color: #0f172a;
+}
+
+h1 {
+  margin-bottom: 0.5rem;
+}
