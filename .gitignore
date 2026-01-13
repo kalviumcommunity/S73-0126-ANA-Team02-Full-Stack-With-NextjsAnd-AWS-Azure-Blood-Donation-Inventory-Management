@@ -10,10 +10,7 @@ pnpm-debug.log*
 out
 bloodlink/
 
-# Env
-.env.local
-.env.*.local
-.env
-.env.development
-.env.staging
-.env.production
+# Env - ignore all dotenv files to prevent committing secrets
+# (Templates like .env.example are intentionally allowed below)
+.env*
+!.env.example
