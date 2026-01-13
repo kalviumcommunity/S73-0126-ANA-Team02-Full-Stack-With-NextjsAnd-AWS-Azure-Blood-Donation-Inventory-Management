@@ -1,7 +1,7 @@
 /* Global styles applied to every page via RootLayout. */
 :root {
   color-scheme: light;
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
 }
 

@@ -12,8 +12,9 @@ export default function HomePage() {
         Current API endpoint (public): <strong>{apiUrl}</strong>
       </p>
       <p>
-        Private secrets like DATABASE_URL stay on the server; access them via server-only code (e.g.,
-        API routes or server actions) so they never reach the browser bundle.
+        Private secrets like DATABASE_URL stay on the server; access them via
+        server-only code (e.g., API routes or server actions) so they never
+        reach the browser bundle.
       </p>
     </main>
   );

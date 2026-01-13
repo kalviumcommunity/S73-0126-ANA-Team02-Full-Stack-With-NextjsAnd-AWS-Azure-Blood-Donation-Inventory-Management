@@ -4,12 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prepare": "husky install",
     "build": "next build",
     "build:dev": "cross-env NODE_ENV=development NEXT_PUBLIC_API_URL=http://localhost:3000/api next build",
     "build:staging": "cross-env NODE_ENV=production NEXT_PUBLIC_API_URL=https://staging.example.com/api next build",
     "build:prod": "cross-env NODE_ENV=production NEXT_PUBLIC_API_URL=https://api.example.com next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "next": "14.2.6",
@@ -23,6 +26,18 @@
     "typescript": "5.5.4",
     "cross-env": "7.0.3",
     "eslint": "8.57.1",
-    "eslint-config-next": "14.2.6"
+    "eslint-config-next": "14.2.6",
+    "prettier": "2.8.8",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^14.0.0"
+  }
+  ,
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

@@ -1,14 +1,18 @@
 {
   "compilerOptions": {
+    // Enabling strict TypeScript checks improves developer experience and app
+    // reliability by catching type errors early. This is recommended for
+    // Next.js App Router projects to ensure component props and server/client
+    // boundaries are well-typed and to reduce runtime bugs.
     "target": "ES2020",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -23,13 +27,6 @@
     ],
     "esModuleInterop": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

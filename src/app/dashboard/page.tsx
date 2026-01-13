@@ -6,7 +6,7 @@ async function getLiveMetrics() {
   return {
     fetchedAt: new Date().toUTCString(),
     pendingDonations: Math.floor(Math.random() * 10) + 5,
-    availableUnits: Math.floor(Math.random() * 50) + 50
+    availableUnits: Math.floor(Math.random() * 50) + 50,
   };
 }
 
@@ -16,7 +16,10 @@ export default async function DashboardPage() {
   return (
     <main>
       <h1>Dashboard</h1>
-      <p>This dashboard is server-rendered on each request for real-time accuracy.</p>
+      <p>
+        This dashboard is server-rendered on each request for real-time
+        accuracy.
+      </p>
       <ul>
         <li>Fetched at: {metrics.fetchedAt}</li>
         <li>Pending donations: {metrics.pendingDonations}</li>
