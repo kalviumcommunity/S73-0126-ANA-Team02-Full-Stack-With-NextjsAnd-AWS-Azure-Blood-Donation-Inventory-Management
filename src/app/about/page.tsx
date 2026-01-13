@@ -4,8 +4,9 @@ export default function AboutPage() {
     <main>
       <h1>About This Project</h1>
       <p>
-        This page is statically generated during the build for fast loads and CDN caching. It suits
-        content that rarely changes, like project descriptions and team info.
+        This page is statically generated during the build for fast loads and
+        CDN caching. It suits content that rarely changes, like project
+        descriptions and team info.
       </p>
     </main>
   );

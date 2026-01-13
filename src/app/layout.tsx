@@ -3,11 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Blood Donation Inventory",
-  description: "Track and manage blood donations with a modern Next.js app."
+  description: "Track and manage blood donations with a modern Next.js app.",
 };
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {

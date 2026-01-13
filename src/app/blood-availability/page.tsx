@@ -7,7 +7,7 @@ async function getAvailabilitySnapshot() {
     { bloodType: "A+", units: 24 },
     { bloodType: "B+", units: 18 },
     { bloodType: "O-", units: 12 },
-    { bloodType: "AB+", units: 7 }
+    { bloodType: "AB+", units: 7 },
   ];
 }
 
@@ -18,8 +18,8 @@ export default async function BloodAvailabilityPage() {
     <main>
       <h1>Blood Availability</h1>
       <p>
-        This page uses ISR: users get fast static responses while the data refreshes in the background
-        every 60 seconds.
+        This page uses ISR: users get fast static responses while the data
+        refreshes in the background every 60 seconds.
       </p>
       <ul>
         {availability.map(({ bloodType, units }) => (

@@ -12,7 +12,7 @@
  * - Do not hardcode secrets in source control. Only `.env.example` is committed as a template.
  */
 export const publicEnv = {
-  apiUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api"
+  apiUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api",
 };
 
 export function getDatabaseUrl() {
@@ -20,7 +20,9 @@ export function getDatabaseUrl() {
   // If you need to pass derived values to the client, sanitize/strip sensitive parts first.
   const url = process.env.DATABASE_URL;
   if (!url) {
-    throw new Error("DATABASE_URL is missing; set it in the server environment.");
+    throw new Error(
+      "DATABASE_URL is missing; set it in the server environment."
+    );
   }
   return url;
 }
