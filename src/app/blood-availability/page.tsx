@@ -1,4 +1,6 @@
 // Incremental Static Regeneration: static by default but revalidated every 60s for near-real-time availability.
+import BloodAvailabilityList from "@/components/BloodAvailabilityList";
+
 export const revalidate = 60; // Next.js will regenerate this page in the background at most once per minute.
 
 async function getAvailabilitySnapshot() {
@@ -21,13 +23,7 @@ export default async function BloodAvailabilityPage() {
         This page uses ISR: users get fast static responses while the data
         refreshes in the background every 60 seconds.
       </p>
-      <ul>
-        {availability.map(({ bloodType, units }) => (
-          <li key={bloodType}>
-            {bloodType}: {units} units
-          </li>
-        ))}
-      </ul>
+      <BloodAvailabilityList availability={availability} />
     </main>
   );
 }

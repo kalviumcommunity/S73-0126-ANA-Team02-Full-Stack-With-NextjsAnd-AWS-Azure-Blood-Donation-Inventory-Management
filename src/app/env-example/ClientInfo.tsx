@@ -9,7 +9,7 @@ export default function ClientInfo() {
 
   useEffect(() => {
     // This reads a client-safe env var that is bundled into the client.
-    setApiBase(process.env.NEXT_PUBLIC_API_BASE_URL);
+    setApiBase(process.env.NEXT_PUBLIC_API_URL);
   }, []);
 
   return (

@@ -1,0 +1,434 @@
+// Prisma Schema for Blood Donation & Inventory Management System
+// Database: PostgreSQL
+// Normalized to 3NF with proper constraints and indexes
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUM DEFINITIONS
+// ============================================
+
+enum UserRole {
+  DONOR        // Blood donor
+  HOSPITAL     // Hospital staff
+  BLOOD_BANK   // Blood bank staff
+  NGO          // NGO staff
+  ADMIN        // System administrator
+}
+
+enum BloodGroup {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+enum RequestStatus {
+  PENDING      // Request submitted
+  APPROVED     // Request approved by blood bank
+  FULFILLED    // Blood delivered
+  REJECTED     // Request rejected
+  CANCELLED    // Request cancelled by requester
+}
+
+enum DonationStatus {
+  SCHEDULED    // Donation appointment scheduled
+  COMPLETED    // Donation completed
+  CANCELLED    // Donation cancelled
+  NO_SHOW      // Donor didn't show up
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+// ============================================
+// USER ENTITY (1NF, 2NF, 3NF)
+// ============================================
+// Represents all users in the system (donors, hospital staff, NGO, admins)
+// Each user has a unique email and phone number
+// Password is hashed and stored securely
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String   // Hashed password
+  role          UserRole @default(DONOR)
+  
+  // Personal Information
+  firstName     String
+  lastName      String
+  phone         String   @unique
+  dateOfBirth   DateTime?
+  gender        Gender?
+  bloodGroup    BloodGroup?
+  
+  // Address Information (Normalized)
+  address       String?
+  city          String?
+  state         String?
+  pincode       String?
+  country       String   @default("India")
+  
+  // Health Information (for donors)
+  weight        Float?   // in kg
+  lastDonation  DateTime? // Last donation date
+  medicalNotes  String?  // Any medical conditions
+  
+  // System Fields
+  isActive      Boolean  @default(true)
+  isVerified    Boolean  @default(false)
+  emailVerified Boolean  @default(false)
+  phoneVerified Boolean  @default(false)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relationships
+  donations     Donation[]     // User's donation history
+  bloodRequests BloodRequest[] // Requests made by user
+  bloodBank     BloodBank?     // If user is blood bank staff
+  hospital      Hospital?      // If user is hospital staff
+  
+  // Indexes for frequently queried fields
+  @@index([email])
+  @@index([phone])
+  @@index([bloodGroup])
+  @@index([city])
+  @@index([role])
+  @@map("users")
+}
+
+// ============================================
+// BLOOD BANK ENTITY (1NF, 2NF, 3NF)
+// ============================================
+// Represents blood banks that store and manage blood inventory
+// Each blood bank has contact information and location
+
+model BloodBank {
+  id              String   @id @default(uuid())
+  name            String
+  registrationNo  String   @unique // Government registration number
+  
+  // Contact Information
+  email           String   @unique
+  phone           String   @unique
+  alternatePhone  String?
+  
+  // Address Information
+  address         String
+  city            String
+  state           String
+  pincode         String
+  country         String   @default("India")
+  latitude        Float?   // For location-based searches
+  longitude       Float?
+  
+  // Operational Information
+  operatingHours  String?  // e.g., "9 AM - 6 PM"
+  isActive        Boolean  @default(true)
+  isVerified      Boolean  @default(false)
+  
+  // System Fields
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Foreign Keys
+  managerId       String?  @unique // Blood bank manager (User)
+  manager         User?    @relation(fields: [managerId], references: [id], onDelete: SetNull)
+  
+  // Relationships
+  inventory       BloodInventory[]
+  donations       Donation[]
+  bloodRequests   BloodRequest[]
+  
+  // Indexes for location-based and frequently queried fields
+  @@index([city])
+  @@index([state])
+  @@index([pincode])
+  @@index([isActive])
+  @@map("blood_banks")
+}
+
+// ============================================
+// HOSPITAL ENTITY (1NF, 2NF, 3NF)
+// ============================================
+// Represents hospitals that can request blood
+// Similar to BloodBank but serves different purpose
+
+model Hospital {
+  id              String   @id @default(uuid())
+  name            String
+  registrationNo  String   @unique // Government registration number
+  
+  // Contact Information
+  email           String   @unique
+  phone           String   @unique
+  alternatePhone  String?
+  emergencyPhone  String?
+  
+  // Address Information
+  address         String
+  city            String
+  state           String
+  pincode         String
+  country         String   @default("India")
+  latitude        Float?
+  longitude       Float?
+  
+  // Operational Information
+  totalBeds       Int?
+  hasBloodBank    Boolean  @default(false) // Hospital has its own blood bank
+  isActive        Boolean  @default(true)
+  isVerified      Boolean  @default(false)
+  
+  // System Fields
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Foreign Keys
+  contactPersonId String?  @unique // Hospital contact person (User)
+  contactPerson   User?    @relation(fields: [contactPersonId], references: [id], onDelete: SetNull)
+  
+  // Relationships
+  bloodRequests   BloodRequest[]
+  
+  // Indexes
+  @@index([city])
+  @@index([state])
+  @@index([pincode])
+  @@index([isActive])
+  @@map("hospitals")
+}
+
+// ============================================
+// BLOOD INVENTORY ENTITY (1NF, 2NF, 3NF)
+// ============================================
+// Represents blood stock at each blood bank
+// One record per blood group per blood bank
+// Quantity is in units (1 unit = 450ml approx)
+
+model BloodInventory {
+  id              String     @id @default(uuid())
+  bloodGroup      BloodGroup
+  quantity        Int        @default(0) // Quantity in units
+  
+  // Quality Control
+  lastUpdated     DateTime   @default(now())
+  expiryDate      DateTime?  // Oldest blood unit expiry in this group
+  
+  // Thresholds
+  minimumQuantity Int        @default(10) // Alert when below this
+  maximumQuantity Int        @default(100)
+  
+  // System Fields
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  
+  // Foreign Keys
+  bloodBankId     String
+  bloodBank       BloodBank  @relation(fields: [bloodBankId], references: [id], onDelete: Cascade)
+  
+  // Constraints: One inventory record per blood group per blood bank
+  @@unique([bloodBankId, bloodGroup])
+  @@index([bloodGroup])
+  @@index([bloodBankId])
+  @@index([quantity])
+  @@map("blood_inventory")
+}
+
+// ============================================
+// BLOOD REQUEST ENTITY (1NF, 2NF, 3NF)
+// ============================================
+// Represents requests for blood from hospitals or individuals
+// Tracks the complete lifecycle of a blood request
+
+model BloodRequest {
+  id              String        @id @default(uuid())
+  
+  // Request Details
+  bloodGroup      BloodGroup
+  quantityNeeded  Int           // Quantity in units
+  urgency         String        @default("NORMAL") // CRITICAL, URGENT, NORMAL
+  
+  // Patient Information
+  patientName     String
+  patientAge      Int?
+  patientGender   Gender?
+  requiredBy      DateTime      // When blood is needed
+  
+  // Medical Information
+  purpose         String        // Purpose of request (surgery, emergency, etc.)
+  medicalNotes    String?
+  doctorName      String?
+  doctorContact   String?
+  
+  // Request Status
+  status          RequestStatus @default(PENDING)
+  rejectionReason String?       // Reason if rejected
+  
+  // Fulfillment Details
+  approvedBy      String?       // Staff who approved
+  approvedAt      DateTime?
+  fulfilledAt     DateTime?
+  cancelledAt     DateTime?
+  
+  // System Fields
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Foreign Keys
+  requesterId     String        // User who made the request
+  requester       User          @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  
+  hospitalId      String?       // Hospital making the request
+  hospital        Hospital?     @relation(fields: [hospitalId], references: [id], onDelete: SetNull)
+  
+  bloodBankId     String?       // Blood bank fulfilling the request
+  bloodBank       BloodBank?    @relation(fields: [bloodBankId], references: [id], onDelete: SetNull)
+  
+  // Indexes for frequently queried fields
+  @@index([requesterId])
+  @@index([hospitalId])
+  @@index([bloodBankId])
+  @@index([bloodGroup])
+  @@index([status])
+  @@index([urgency])
+  @@index([requiredBy])
+  @@index([createdAt])
+  @@map("blood_requests")
+}
+
+// ============================================
+// DONATION ENTITY (1NF, 2NF, 3NF)
+// ============================================
+// Represents blood donation events
+// Links donors, blood banks, and tracks donation lifecycle
+
+model Donation {
+  id                String          @id @default(uuid())
+  
+  // Donation Details
+  bloodGroup        BloodGroup
+  quantity          Float           @default(1.0) // Quantity in units (usually 1 unit = 450ml)
+  
+  // Donation Information
+  donationDate      DateTime?       // Actual donation date (null if scheduled)
+  scheduledDate     DateTime        // When donation is scheduled/was scheduled
+  status            DonationStatus  @default(SCHEDULED)
+  
+  // Health Check Information
+  hemoglobinLevel   Float?          // in g/dL
+  bloodPressure     String?         // e.g., "120/80"
+  weight            Float?          // in kg
+  temperature       Float?          // in Celsius
+  isEligible        Boolean         @default(true)
+  rejectionReason   String?         // If donor was rejected
+  
+  // Medical Information
+  preTestNotes      String?         // Notes before donation
+  postTestNotes     String?         // Notes after donation
+  adverseReaction   String?         // Any adverse reaction during/after donation
+  
+  // Blood Unit Information
+  unitSerialNumber  String?         @unique // Unique identifier for blood unit
+  expiryDate        DateTime?       // When blood unit expires (typically 35-42 days)
+  collectedBy       String?         // Staff who collected the blood
+  
+  // System Fields
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Foreign Keys
+  donorId           String
+  donor             User            @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  
+  bloodBankId       String
+  bloodBank         BloodBank       @relation(fields: [bloodBankId], references: [id], onDelete: Cascade)
+  
+  // Indexes for frequently queried fields
+  @@index([donorId])
+  @@index([bloodBankId])
+  @@index([bloodGroup])
+  @@index([status])
+  @@index([donationDate])
+  @@index([scheduledDate])
+  @@index([unitSerialNumber])
+  @@map("donations")
+}
+
+// ============================================
+// ADDITIONAL ENTITIES FOR EXTENSIBILITY
+// ============================================
+
+// Audit Log for tracking important system events
+model AuditLog {
+  id          String   @id @default(uuid())
+  entityType  String   // e.g., "User", "BloodRequest", "Donation"
+  entityId    String   // ID of the entity
+  action      String   // e.g., "CREATE", "UPDATE", "DELETE"
+  changes     Json?    // JSON object with old and new values
+  performedBy String?  // User ID who performed the action
+  ipAddress   String?
+  userAgent   String?
+  timestamp   DateTime @default(now())
+  
+  @@index([entityType, entityId])
+  @@index([performedBy])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+
+// Notification for users
+model Notification {
+  id         String   @id @default(uuid())
+  userId     String
+  title      String
+  message    String
+  type       String   // e.g., "DONATION_REMINDER", "REQUEST_APPROVED", "INVENTORY_LOW"
+  isRead     Boolean  @default(false)
+  link       String?  // Link to related entity
+  createdAt  DateTime @default(now())
+  
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// Campaign for organizing blood donation drives
+model Campaign {
+  id            String   @id @default(uuid())
+  name          String
+  description   String
+  startDate     DateTime
+  endDate       DateTime
+  location      String
+  city          String
+  organizer     String   // Organization name
+  contactPerson String
+  contactPhone  String
+  isActive      Boolean  @default(true)
+  targetUnits   Int?     // Target blood units to collect
+  collectedUnits Int     @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([city])
+  @@index([startDate, endDate])
+  @@index([isActive])
+  @@map("campaigns")
+}

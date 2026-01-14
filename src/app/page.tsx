@@ -1,4 +1,6 @@
 import { publicEnv } from "../lib/env";
+import Welcome from "../components/Welcome";
+import ApiInfo from "../components/ApiInfo";
 
 export default function HomePage() {
   /* Server Component reads a public env var; NEXT_PUBLIC_ values are safe to send to clients. */
@@ -6,16 +8,8 @@ export default function HomePage() {
 
   return (
     <main>
-      <h1>Welcome to Blood Donation Inventory</h1>
-      <p>Next.js App Router + TypeScript + React Server Components.</p>
-      <p>
-        Current API endpoint (public): <strong>{apiUrl}</strong>
-      </p>
-      <p>
-        Private secrets like DATABASE_URL stay on the server; access them via
-        server-only code (e.g., API routes or server actions) so they never
-        reach the browser bundle.
-      </p>
+      <Welcome />
+      <ApiInfo apiUrl={apiUrl} />
     </main>
   );
 }
