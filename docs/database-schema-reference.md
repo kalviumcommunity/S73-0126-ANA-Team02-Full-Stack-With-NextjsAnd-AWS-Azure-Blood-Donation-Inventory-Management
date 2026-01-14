@@ -2,21 +2,22 @@
 
 ## 📋 Table Summary
 
-| Entity | Purpose | Key Relationships |
-|--------|---------|-------------------|
-| **User** | All system users | → Donation, BloodRequest, BloodBank, Hospital |
-| **BloodBank** | Blood bank locations | → BloodInventory, Donation, BloodRequest |
-| **Hospital** | Hospital facilities | → BloodRequest |
-| **BloodInventory** | Blood stock levels | → BloodBank |
-| **BloodRequest** | Blood requests | → User, Hospital, BloodBank |
-| **Donation** | Donation records | → User, BloodBank |
-| **Campaign** | Blood drives | Standalone |
-| **Notification** | User notifications | Standalone |
-| **AuditLog** | System audit trail | Standalone |
+| Entity             | Purpose              | Key Relationships                             |
+| ------------------ | -------------------- | --------------------------------------------- |
+| **User**           | All system users     | → Donation, BloodRequest, BloodBank, Hospital |
+| **BloodBank**      | Blood bank locations | → BloodInventory, Donation, BloodRequest      |
+| **Hospital**       | Hospital facilities  | → BloodRequest                                |
+| **BloodInventory** | Blood stock levels   | → BloodBank                                   |
+| **BloodRequest**   | Blood requests       | → User, Hospital, BloodBank                   |
+| **Donation**       | Donation records     | → User, BloodBank                             |
+| **Campaign**       | Blood drives         | Standalone                                    |
+| **Notification**   | User notifications   | Standalone                                    |
+| **AuditLog**       | System audit trail   | Standalone                                    |
 
 ## 🔑 Primary Entities
 
 ### User
+
 ```typescript
 {
   id: UUID (PK)
@@ -30,9 +31,11 @@
 ```
 
 **Indexes:**
+
 - `email`, `phone`, `bloodGroup`, `city`, `role`
 
 **Relationships:**
+
 - 1 User → Many Donations
 - 1 User → Many BloodRequests
 - 1 User ← 1 BloodBank (manager)
@@ -41,6 +44,7 @@
 ---
 
 ### BloodBank
+
 ```typescript
 {
   id: UUID (PK)
@@ -57,9 +61,11 @@
 ```
 
 **Indexes:**
+
 - `city`, `state`, `pincode`, `isActive`
 
 **Relationships:**
+
 - 1 BloodBank → Many BloodInventory
 - 1 BloodBank → Many Donations
 - 1 BloodBank → Many BloodRequests
@@ -68,6 +74,7 @@
 ---
 
 ### BloodInventory
+
 ```typescript
 {
   id: UUID (PK)
@@ -81,17 +88,21 @@
 ```
 
 **Unique Constraint:**
+
 - `(bloodBankId, bloodGroup)` - One record per blood group per bank
 
 **Indexes:**
+
 - `bloodGroup`, `bloodBankId`, `quantity`
 
 **Relationships:**
+
 - 1 BloodInventory → 1 BloodBank
 
 ---
 
 ### BloodRequest
+
 ```typescript
 {
   id: UUID (PK)
@@ -108,10 +119,12 @@
 ```
 
 **Indexes:**
+
 - `requesterId`, `hospitalId`, `bloodBankId`
 - `bloodGroup`, `status`, `urgency`, `requiredBy`, `createdAt`
 
 **Relationships:**
+
 - 1 BloodRequest → 1 User (requester)
 - 1 BloodRequest → 1 Hospital (optional)
 - 1 BloodRequest → 1 BloodBank (optional)
@@ -119,6 +132,7 @@
 ---
 
 ### Donation
+
 ```typescript
 {
   id: UUID (PK)
@@ -137,17 +151,20 @@
 ```
 
 **Indexes:**
+
 - `donorId`, `bloodBankId`
 - `bloodGroup`, `status`, `donationDate`, `scheduledDate`
 - `unitSerialNumber`
 
 **Relationships:**
+
 - 1 Donation → 1 User (donor)
 - 1 Donation → 1 BloodBank
 
 ---
 
 ### Hospital
+
 ```typescript
 {
   id: UUID (PK)
@@ -164,9 +181,11 @@
 ```
 
 **Indexes:**
+
 - `city`, `state`, `pincode`, `isActive`
 
 **Relationships:**
+
 - 1 Hospital → Many BloodRequests
 - 1 Hospital → 1 User (contact person)
 
@@ -175,14 +194,18 @@
 ## 🔗 Cascade Rules
 
 ### ON DELETE CASCADE
+
 When parent is deleted, children are automatically deleted:
+
 - User → Donations (delete user = delete their donations)
 - User → BloodRequests (delete user = delete their requests)
 - BloodBank → BloodInventory (delete bank = delete inventory)
 - BloodBank → Donations (delete bank = delete donations there)
 
 ### ON DELETE SET NULL
+
 When parent is deleted, foreign key is set to NULL:
+
 - User → BloodBank.managerId
 - User → Hospital.contactPersonId
 - Hospital → BloodRequest.hospitalId
@@ -193,13 +216,14 @@ When parent is deleted, foreign key is set to NULL:
 ## 🎯 Common Query Patterns
 
 ### Find Available Blood in City
+
 ```typescript
 const inventory = await prisma.bloodInventory.findMany({
   where: {
-    bloodGroup: 'O_POSITIVE',
+    bloodGroup: "O_POSITIVE",
     quantity: { gt: 0 },
     bloodBank: {
-      city: 'Mumbai',
+      city: "Mumbai",
       isActive: true,
     },
   },
@@ -208,14 +232,15 @@ const inventory = await prisma.bloodInventory.findMany({
 ```
 
 ### Get Eligible Donors
+
 ```typescript
 const donors = await prisma.user.findMany({
   where: {
-    role: 'DONOR',
-    bloodGroup: 'A_POSITIVE',
+    role: "DONOR",
+    bloodGroup: "A_POSITIVE",
     isActive: true,
     isVerified: true,
-    city: 'Mumbai',
+    city: "Mumbai",
     lastDonation: {
       lt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 90 days ago
     },
@@ -224,28 +249,30 @@ const donors = await prisma.user.findMany({
 ```
 
 ### Create Blood Request
+
 ```typescript
 const request = await prisma.bloodRequest.create({
   data: {
     requesterId: userId,
     hospitalId: hospitalId,
-    bloodGroup: 'B_POSITIVE',
+    bloodGroup: "B_POSITIVE",
     quantityNeeded: 2,
-    urgency: 'CRITICAL',
-    patientName: 'John Doe',
-    requiredBy: new Date('2025-01-20'),
-    purpose: 'Emergency surgery',
+    urgency: "CRITICAL",
+    patientName: "John Doe",
+    requiredBy: new Date("2025-01-20"),
+    purpose: "Emergency surgery",
   },
 });
 ```
 
 ### Update Inventory After Donation
+
 ```typescript
 await prisma.bloodInventory.update({
   where: {
     bloodBankId_bloodGroup: {
       bloodBankId: bloodBankId,
-      bloodGroup: 'O_POSITIVE',
+      bloodGroup: "O_POSITIVE",
     },
   },
   data: {
@@ -260,6 +287,7 @@ await prisma.bloodInventory.update({
 ## 📊 Enums Reference
 
 ### UserRole
+
 - `DONOR` - Blood donor
 - `HOSPITAL` - Hospital staff
 - `BLOOD_BANK` - Blood bank staff
@@ -267,12 +295,14 @@ await prisma.bloodInventory.update({
 - `ADMIN` - System administrator
 
 ### BloodGroup
+
 - `A_POSITIVE`, `A_NEGATIVE`
 - `B_POSITIVE`, `B_NEGATIVE`
 - `AB_POSITIVE`, `AB_NEGATIVE`
 - `O_POSITIVE`, `O_NEGATIVE`
 
 ### RequestStatus
+
 - `PENDING` - Submitted
 - `APPROVED` - Approved by blood bank
 - `FULFILLED` - Blood delivered
@@ -280,12 +310,14 @@ await prisma.bloodInventory.update({
 - `CANCELLED` - Cancelled by requester
 
 ### DonationStatus
+
 - `SCHEDULED` - Appointment scheduled
 - `COMPLETED` - Donation done
 - `CANCELLED` - Cancelled
 - `NO_SHOW` - Donor didn't show
 
 ### Gender
+
 - `MALE`, `FEMALE`, `OTHER`
 
 ---
@@ -293,6 +325,7 @@ await prisma.bloodInventory.update({
 ## 🛡️ Constraints Summary
 
 ### Unique Constraints
+
 - User: `email`, `phone`
 - BloodBank: `registrationNo`, `email`, `phone`, `managerId`
 - Hospital: `registrationNo`, `email`, `phone`, `contactPersonId`
@@ -300,6 +333,7 @@ await prisma.bloodInventory.update({
 - BloodInventory: `(bloodBankId, bloodGroup)` composite
 
 ### Required Fields (NOT NULL)
+
 - All IDs, email, password, role
 - Names, phone numbers
 - Addresses (street, city, state)
@@ -308,6 +342,7 @@ await prisma.bloodInventory.update({
 - Timestamps (createdAt, updatedAt)
 
 ### Default Values
+
 - User.role: `DONOR`
 - User.isActive: `true`
 - User.country: `"India"`
@@ -320,6 +355,7 @@ await prisma.bloodInventory.update({
 ## 💡 Best Practices
 
 ### 1. Always Use Transactions for Related Updates
+
 ```typescript
 await prisma.$transaction([
   prisma.donation.update({ ... }),
@@ -328,6 +364,7 @@ await prisma.$transaction([
 ```
 
 ### 2. Use Select to Reduce Payload
+
 ```typescript
 const users = await prisma.user.findMany({
   select: {
@@ -340,11 +377,13 @@ const users = await prisma.user.findMany({
 ```
 
 ### 3. Leverage Indexes for Performance
+
 - Always filter on indexed fields
 - Use composite indexes for multi-field queries
-- Avoid SELECT * in production
+- Avoid SELECT \* in production
 
 ### 4. Handle Cascading Deletes Carefully
+
 ```typescript
 // This will delete all user's donations and requests!
 await prisma.user.delete({ where: { id: userId } });

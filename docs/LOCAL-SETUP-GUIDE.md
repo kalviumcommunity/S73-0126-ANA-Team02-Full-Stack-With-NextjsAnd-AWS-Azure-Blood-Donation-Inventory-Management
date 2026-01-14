@@ -18,6 +18,7 @@ Before starting, ensure you have:
 ## Step 1: Install PostgreSQL (If Not Installed)
 
 ### Windows
+
 ```powershell
 # Option 1: Using Chocolatey
 choco install postgresql
@@ -27,6 +28,7 @@ choco install postgresql
 ```
 
 ### Mac
+
 ```bash
 # Using Homebrew
 brew install postgresql@14
@@ -34,6 +36,7 @@ brew services start postgresql@14
 ```
 
 ### Linux (Ubuntu/Debian)
+
 ```bash
 sudo apt update
 sudo apt install postgresql postgresql-contrib
@@ -45,6 +48,7 @@ sudo systemctl start postgresql
 ## Step 2: Create PostgreSQL Database
 
 ### Windows (PowerShell)
+
 ```powershell
 # Connect to PostgreSQL (default user is 'postgres')
 psql -U postgres
@@ -63,6 +67,7 @@ GRANT ALL PRIVILEGES ON DATABASE blood_bank_db TO bloodbank_user;
 ```
 
 ### Mac/Linux (Terminal)
+
 ```bash
 # Switch to postgres user
 sudo -u postgres psql
@@ -120,6 +125,7 @@ npm install
 ```
 
 This installs:
+
 - `@prisma/client` - Prisma database client
 - `prisma` - Prisma CLI (dev dependency)
 - `bcryptjs` - Password hashing
@@ -136,11 +142,13 @@ npm run prisma:generate
 ```
 
 This command:
+
 - Reads `prisma/schema.prisma`
 - Generates TypeScript types
 - Creates the Prisma Client API
 
 **Expected Output:**
+
 ```
 ✔ Generated Prisma Client (5.x.x) to ./node_modules/@prisma/client
 ```
@@ -150,12 +158,14 @@ This command:
 ## Step 6: Run Database Migrations
 
 ### Option A: Development (Recommended for local setup)
+
 ```bash
 # Push schema to database without creating migration files
 npm run prisma:push
 ```
 
 **Expected Output:**
+
 ```
 ✔ Prisma schema loaded from prisma/schema.prisma
 ✔ Datasource "db": PostgreSQL database "blood_bank_db"
@@ -163,6 +173,7 @@ npm run prisma:push
 ```
 
 ### Option B: Production-Style (Creates migration history)
+
 ```bash
 # Create and apply migration
 npm run prisma:migrate
@@ -172,6 +183,7 @@ npx prisma migrate dev --name init
 ```
 
 **Expected Output:**
+
 ```
 ✔ Prisma schema loaded from prisma/schema.prisma
 ✔ Database schema created in the database
@@ -188,6 +200,7 @@ npm run prisma:seed
 ```
 
 **Expected Output:**
+
 ```
 🌱 Starting database seed...
 ✅ Admin user created: admin@bloodbank.com
@@ -206,24 +219,28 @@ npm run prisma:seed
 ### Sample Data Created:
 
 #### Users
-| Email | Password | Role | Blood Group |
-|-------|----------|------|-------------|
-| admin@bloodbank.com | admin123 | ADMIN | - |
-| john.doe@example.com | donor123 | DONOR | O+ |
-| jane.smith@example.com | donor123 | DONOR | A+ |
+
+| Email                  | Password | Role  | Blood Group |
+| ---------------------- | -------- | ----- | ----------- |
+| admin@bloodbank.com    | admin123 | ADMIN | -           |
+| john.doe@example.com   | donor123 | DONOR | O+          |
+| jane.smith@example.com | donor123 | DONOR | A+          |
 
 #### Blood Banks
-| Name | City | Registration No |
-|------|------|-----------------|
-| Central Blood Bank | Mumbai | BB-MH-001-2024 |
-| Lifesaver Blood Bank | New Delhi | BB-DL-002-2024 |
+
+| Name                 | City      | Registration No |
+| -------------------- | --------- | --------------- |
+| Central Blood Bank   | Mumbai    | BB-MH-001-2024  |
+| Lifesaver Blood Bank | New Delhi | BB-DL-002-2024  |
 
 #### Hospital
-| Name | City | Registration No |
-|------|------|-----------------|
+
+| Name                  | City   | Registration No  |
+| --------------------- | ------ | ---------------- |
 | City General Hospital | Mumbai | HOSP-MH-001-2024 |
 
 #### Blood Inventory
+
 - All 8 blood groups (A+, A-, B+, B-, AB+, AB-, O+, O-) for both blood banks
 - Random quantities between 15-70 units
 
@@ -232,18 +249,21 @@ npm run prisma:seed
 ## Step 8: Verify Database Setup
 
 ### Method 1: Using Prisma Studio (Recommended)
+
 ```bash
 # Open Prisma Studio in browser
 npm run prisma:studio
 ```
 
 This opens **http://localhost:5555** where you can:
+
 - ✅ View all tables
 - ✅ Browse records
 - ✅ Edit data (be careful!)
 - ✅ Verify relationships
 
 **What to check:**
+
 - [ ] Users table has 3 records
 - [ ] BloodBank table has 2 records
 - [ ] Hospital table has 1 record
@@ -252,6 +272,7 @@ This opens **http://localhost:5555** where you can:
 - [ ] Campaign table has 1 record
 
 ### Method 2: Using psql Command Line
+
 ```bash
 # Connect to database
 psql -U postgres -d blood_bank_db
@@ -266,8 +287,8 @@ SELECT id, email, role, "firstName", "lastName" FROM users;
 SELECT id, name, city, "registrationNo" FROM blood_banks;
 
 # Check blood inventory
-SELECT bg."bloodGroup", bg.quantity, bb.name 
-FROM blood_inventory bg 
+SELECT bg."bloodGroup", bg.quantity, bb.name
+FROM blood_inventory bg
 JOIN blood_banks bb ON bg."bloodBankId" = bb.id;
 
 # Exit
@@ -275,6 +296,7 @@ JOIN blood_banks bb ON bg."bloodBankId" = bb.id;
 ```
 
 ### Method 3: Test with API (If Next.js is running)
+
 ```bash
 # Start the development server
 npm run dev
@@ -308,6 +330,7 @@ npx prisma db execute --stdin < "SELECT version();"
 ## Common Commands Reference
 
 ### Database Management
+
 ```bash
 # Generate Prisma Client
 npm run prisma:generate
@@ -326,6 +349,7 @@ npx prisma migrate reset
 ```
 
 ### Data Management
+
 ```bash
 # Seed database
 npm run prisma:seed
@@ -335,6 +359,7 @@ npm run prisma:studio
 ```
 
 ### Schema Management
+
 ```bash
 # Format schema file
 npx prisma format
@@ -351,9 +376,11 @@ npx prisma db pull
 ## Troubleshooting
 
 ### Issue 1: Connection Failed
+
 **Error**: `Can't reach database server`
 
 **Solutions**:
+
 ```bash
 # Check if PostgreSQL is running
 # Windows:
@@ -377,20 +404,25 @@ sudo systemctl restart postgresql
 ```
 
 ### Issue 2: Authentication Failed
+
 **Error**: `password authentication failed`
 
 **Solutions**:
+
 1. Check your `.env` file has correct credentials
 2. Verify PostgreSQL user exists:
+
 ```sql
 psql -U postgres
 \du  -- List all users
 ```
 
 ### Issue 3: Database Does Not Exist
+
 **Error**: `database "blood_bank_db" does not exist`
 
 **Solution**:
+
 ```bash
 psql -U postgres
 CREATE DATABASE blood_bank_db;
@@ -398,9 +430,11 @@ CREATE DATABASE blood_bank_db;
 ```
 
 ### Issue 4: Permission Denied
+
 **Error**: `permission denied for schema public`
 
 **Solution**:
+
 ```sql
 psql -U postgres -d blood_bank_db
 GRANT ALL PRIVILEGES ON SCHEMA public TO bloodbank_user;
@@ -409,9 +443,11 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO bloodbank_user;
 ```
 
 ### Issue 5: Port Already in Use
+
 **Error**: `port 5432 is already allocated`
 
 **Solutions**:
+
 ```bash
 # Find what's using the port
 # Windows:
@@ -425,9 +461,11 @@ DATABASE_URL="postgresql://user:pass@localhost:5433/blood_bank_db"
 ```
 
 ### Issue 6: Prisma Client Not Generated
+
 **Error**: `Cannot find module '@prisma/client'`
 
 **Solution**:
+
 ```bash
 npm run prisma:generate
 npm install
@@ -440,18 +478,21 @@ npm install
 After completing all steps, verify:
 
 ### Database Level
+
 - [ ] PostgreSQL is running
 - [ ] Database `blood_bank_db` exists
 - [ ] All 9 tables are created
 - [ ] Foreign key relationships are intact
 
 ### Prisma Level
+
 - [ ] Prisma Client is generated
 - [ ] Schema is valid (`npx prisma validate`)
 - [ ] Can connect to database (`npx prisma db pull`)
 - [ ] Prisma Studio opens successfully
 
 ### Data Level
+
 - [ ] 3 users exist (1 admin, 2 donors)
 - [ ] 2 blood banks exist
 - [ ] 1 hospital exists
@@ -460,6 +501,7 @@ After completing all steps, verify:
 - [ ] 1 campaign exists
 
 ### Application Level
+
 - [ ] Next.js server starts without errors
 - [ ] Can import Prisma client in code
 - [ ] No TypeScript errors in schema-related files
@@ -469,19 +511,23 @@ After completing all steps, verify:
 ## Next Steps After Setup
 
 1. **Explore the Database**
+
    ```bash
    npm run prisma:studio
    ```
 
 2. **Test Authentication**
+
    - Try logging in with sample users
    - Verify password hashing works
 
 3. **Test API Routes**
+
    - Create example API endpoints
    - Test CRUD operations
 
 4. **Build Frontend Forms**
+
    - User registration
    - Blood request forms
    - Donation scheduling
@@ -538,6 +584,7 @@ npm run dev
 ## Support
 
 If you encounter issues:
+
 1. Check the troubleshooting section above
 2. Review error messages carefully
 3. Verify PostgreSQL is running

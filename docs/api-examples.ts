@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Example API Route Implementations
  *

@@ -3,6 +3,7 @@
 ## Step 1: Create PostgreSQL Database ✅
 
 **Option A: Using pgAdmin (Recommended)**
+
 1. Open **pgAdmin 4** from Start menu
 2. Connect to localhost server
 3. Right-click **Databases** → **Create** → **Database**
@@ -10,10 +11,12 @@
 5. Click **Save**
 
 **Option B: Using SQL Shell**
+
 1. Open **SQL Shell (psql)** from Start menu
 2. Press Enter for defaults (Server, Database, Port, Username)
 3. Enter your PostgreSQL password
 4. Run:
+
 ```sql
 CREATE DATABASE blood_bank_db;
 \q
@@ -23,6 +26,7 @@ CREATE DATABASE blood_bank_db;
 
 1. Open `.env` in your editor
 2. Update line 12 with your actual password:
+
 ```env
 DATABASE_URL="postgresql://postgres:YOUR_PASSWORD_HERE@localhost:5432/blood_bank_db?schema=public"
 ```
@@ -30,6 +34,7 @@ DATABASE_URL="postgresql://postgres:YOUR_PASSWORD_HERE@localhost:5432/blood_bank
 Replace `YOUR_PASSWORD_HERE` with the password you set during PostgreSQL installation.
 
 **Example:**
+
 ```env
 DATABASE_URL="postgresql://postgres:admin123@localhost:5432/blood_bank_db?schema=public"
 ```
@@ -53,6 +58,7 @@ npm run prisma:studio
 ```
 
 **Or use the one-command setup:**
+
 ```powershell
 npm run db:setup
 npm run prisma:studio
@@ -63,6 +69,7 @@ npm run prisma:studio
 After running the commands, you should see:
 
 ✅ **12 tables created:**
+
 - users
 - blood_banks
 - hospitals
@@ -74,6 +81,7 @@ After running the commands, you should see:
 - audit_logs
 
 ✅ **Sample data seeded:**
+
 - 3 Users (1 Admin, 2 Donors)
 - 2 Blood Banks
 - 1 Hospital
@@ -86,12 +94,14 @@ After running the commands, you should see:
 ## Troubleshooting 🔧
 
 ### Error: "Can't reach database server"
+
 - ✅ Check PostgreSQL is running
 - ✅ Verify DATABASE_URL in `.env`
 - ✅ Confirm database `blood_bank_db` exists
 - ✅ Check password is correct
 
 ### Error: "P1001: Can't reach database"
+
 ```powershell
 # Restart PostgreSQL
 net stop postgresql-x64-16
@@ -99,6 +109,7 @@ net start postgresql-x64-16
 ```
 
 ### Error: "Database does not exist"
+
 Create the database using pgAdmin or SQL Shell (see Step 1)
 
 ## Next Steps 🎯
