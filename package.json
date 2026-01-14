@@ -22,7 +22,9 @@
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:validate": "prisma validate",
     "prisma:format": "prisma format",
-    "test:db": "tsx scripts/test-db-connection.ts"
+    "test:db": "tsx scripts/test-db-connection.ts",
+    "demo:transaction": "tsx scripts/demo-transaction.ts",
+    "demo:optimized": "tsx scripts/demo-optimized-queries.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
