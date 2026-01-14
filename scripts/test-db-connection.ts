@@ -161,7 +161,7 @@ async function testDatabaseConnection() {
     console.error("\nTroubleshooting steps:");
     console.error("1. Verify PostgreSQL is running");
     console.error("2. Check DATABASE_URL in .env file");
-    console.error(`3. Ensure database "blood_bank_db" exists`);
+    console.error("3. Ensure database blood_bank_db exists");
     console.error("4. Run: npm run prisma:push");
     console.error("5. Run: npm run prisma:seed\n");
     process.exit(1);
