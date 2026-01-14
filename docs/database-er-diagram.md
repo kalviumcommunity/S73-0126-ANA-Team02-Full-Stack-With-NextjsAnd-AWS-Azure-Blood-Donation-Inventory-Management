@@ -1,6 +1,7 @@
 # Database Entity-Relationship Diagram
 
 ## Overview
+
 This document provides a visual representation of the Blood Donation & Inventory Management database schema.
 
 ## Entity-Relationship Diagram
@@ -147,6 +148,7 @@ This document provides a visual representation of the Blood Donation & Inventory
 ## Relationship Types
 
 ### One-to-Many (1:N)
+
 - **User → Donations**: One user can make many donations
 - **User → BloodRequests**: One user can create many blood requests
 - **BloodBank → BloodInventory**: One blood bank has multiple inventory records (one per blood group)
@@ -155,10 +157,12 @@ This document provides a visual representation of the Blood Donation & Inventory
 - **Hospital → BloodRequests**: One hospital makes many requests
 
 ### One-to-One (1:1)
+
 - **User ← BloodBank**: One blood bank has one manager (optional)
 - **User ← Hospital**: One hospital has one contact person (optional)
 
 ### Many-to-One (N:1) / Foreign Keys
+
 - **Donation → User**: Many donations from one user (donorId)
 - **Donation → BloodBank**: Many donations to one blood bank (bloodBankId)
 - **BloodRequest → User**: Many requests from one user (requesterId)
@@ -169,7 +173,9 @@ This document provides a visual representation of the Blood Donation & Inventory
 ## Cascade Behavior
 
 ### ON DELETE CASCADE
+
 When parent is deleted, children are automatically deleted:
+
 ```
 User (deleted) → Donations (CASCADE)
 User (deleted) → BloodRequests (CASCADE)
@@ -178,7 +184,9 @@ BloodBank (deleted) → Donations (CASCADE)
 ```
 
 ### ON DELETE SET NULL
+
 When parent is deleted, foreign key is set to NULL:
+
 ```
 User (deleted) → BloodBank.managerId (SET NULL)
 User (deleted) → Hospital.contactPersonId (SET NULL)
@@ -189,21 +197,25 @@ BloodBank (deleted) → BloodRequest.bloodBankId (SET NULL)
 ## Unique Constraints
 
 ### Single Column Unique
+
 - User: `email`, `phone`
 - BloodBank: `registrationNo`, `email`, `phone`
 - Hospital: `registrationNo`, `email`, `phone`
 - Donation: `unitSerialNumber`
 
 ### Composite Unique
+
 - BloodInventory: `(bloodBankId, bloodGroup)` - One record per blood group per blood bank
 
 ### Optional Unique (1:1 Relationships)
+
 - BloodBank: `managerId` (only one blood bank per manager)
 - Hospital: `contactPersonId` (only one hospital per contact)
 
 ## Indexes Summary
 
 ### High-Priority Indexes (Frequent Queries)
+
 ```sql
 -- User Table
 CREATE INDEX idx_user_email ON users(email);
@@ -246,6 +258,7 @@ CREATE INDEX idx_donation_unit_serial ON donations(unit_serial_number);
 ## Data Flow Examples
 
 ### Donation Workflow
+
 ```
 1. Donor (User) schedules donation
    ↓
@@ -261,6 +274,7 @@ CREATE INDEX idx_donation_unit_serial ON donations(unit_serial_number);
 ```
 
 ### Blood Request Workflow
+
 ```
 1. Hospital creates BloodRequest (status: PENDING)
    ↓

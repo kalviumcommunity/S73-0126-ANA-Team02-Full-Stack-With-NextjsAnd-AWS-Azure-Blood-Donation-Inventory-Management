@@ -1,16 +1,19 @@
 # Database Setup Guide
 
 ## Overview
+
 This document explains the normalized database schema for the Blood Donation & Inventory Management system using PostgreSQL and Prisma.
 
 ## 📊 Database Schema Features
 
 ### ✅ Normalization (1NF, 2NF, 3NF)
+
 - **1NF**: All tables have atomic values, no repeating groups
 - **2NF**: No partial dependencies; all non-key attributes depend on the entire primary key
 - **3NF**: No transitive dependencies; all attributes depend directly on the primary key
 
 ### ✅ Key Constraints
+
 - **Primary Keys**: UUID-based unique identifiers for all entities
 - **Foreign Keys**: Proper relationships with referential integrity
 - **Unique Constraints**: Email, phone, registration numbers
@@ -18,6 +21,7 @@ This document explains the normalized database schema for the Blood Donation & I
 - **ON DELETE CASCADE**: Automatic cleanup of related records
 
 ### ✅ Performance Optimization
+
 - **Indexes**: Strategic indexes on frequently queried fields:
   - `bloodGroup`, `city`, `state`, `pincode`
   - `userId`, `hospitalId`, `bloodBankId`
@@ -57,17 +61,21 @@ BloodRequest (N) ─ (1) User (requester)
 ## 🚀 Setup Instructions
 
 ### 1. Prerequisites
+
 Ensure you have:
+
 - Node.js (v18 or higher)
 - PostgreSQL (v14 or higher)
 - Git
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
 This will install:
+
 - `@prisma/client` - Prisma database client
 - `prisma` - Prisma CLI (dev dependency)
 - `bcryptjs` - Password hashing
@@ -92,6 +100,7 @@ DATABASE_URL="postgresql://username:password@localhost:5432/blood_bank_db?schema
 ### 4. Create Database
 
 #### Option A: Using PostgreSQL CLI
+
 ```bash
 # Connect to PostgreSQL
 psql -U postgres
@@ -104,6 +113,7 @@ CREATE DATABASE blood_bank_db;
 ```
 
 #### Option B: Using GUI (pgAdmin, DBeaver, etc.)
+
 - Create a new database named `blood_bank_db`
 
 ### 5. Run Migrations
@@ -130,6 +140,7 @@ npm run prisma:seed
 ```
 
 This creates:
+
 - 1 Admin user
 - 2 Blood banks with inventory
 - 1 Hospital
@@ -138,6 +149,7 @@ This creates:
 - Sample campaign
 
 **Default credentials:**
+
 - Admin: `admin@bloodbank.com` / `admin123`
 - Donor: `john.doe@example.com` / `donor123`
 
@@ -179,14 +191,18 @@ npx prisma validate
 ## 🔐 Security Best Practices
 
 ### 1. Password Hashing
+
 Always hash passwords using bcrypt:
+
 ```typescript
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 const hashedPassword = await bcrypt.hash(password, 10);
 ```
 
 ### 2. Input Validation
+
 Use Zod for runtime validation:
+
 ```typescript
 import { z } from 'zod';
 
@@ -198,7 +214,9 @@ const userSchema = z.object({
 ```
 
 ### 3. Environment Variables
+
 Never commit `.env` files. Use environment variables for:
+
 - `DATABASE_URL`
 - API keys
 - Secret tokens
@@ -206,30 +224,35 @@ Never commit `.env` files. Use environment variables for:
 ## 📊 Schema Details
 
 ### User Entity
+
 - **Purpose**: Stores all users (donors, staff, admins)
 - **Key Fields**: email, role, bloodGroup, city
 - **Relationships**: donations, bloodRequests, bloodBank, hospital
 - **Indexes**: email, phone, bloodGroup, city, role
 
 ### BloodBank Entity
+
 - **Purpose**: Blood bank locations and details
 - **Key Fields**: registrationNo, city, state, coordinates
 - **Relationships**: inventory, donations, bloodRequests
 - **Indexes**: city, state, pincode, isActive
 
 ### BloodInventory Entity
+
 - **Purpose**: Current blood stock at each blood bank
 - **Key Fields**: bloodGroup, quantity, expiryDate
 - **Constraints**: One record per blood group per blood bank
 - **Indexes**: bloodGroup, bloodBankId, quantity
 
 ### BloodRequest Entity
+
 - **Purpose**: Tracks blood requests lifecycle
 - **Key Fields**: bloodGroup, quantityNeeded, status, urgency
 - **Relationships**: requester, hospital, bloodBank
 - **Indexes**: bloodGroup, status, urgency, requiredBy
 
 ### Donation Entity
+
 - **Purpose**: Records blood donation events
 - **Key Fields**: bloodGroup, donationDate, status, unitSerialNumber
 - **Relationships**: donor, bloodBank
@@ -238,11 +261,12 @@ Never commit `.env` files. Use environment variables for:
 ## 🔍 Common Queries
 
 ### Get Blood Availability by City
+
 ```typescript
 const inventory = await prisma.bloodInventory.findMany({
   where: {
     bloodBank: {
-      city: 'Mumbai',
+      city: "Mumbai",
       isActive: true,
     },
     quantity: { gt: 0 },
@@ -260,12 +284,13 @@ const inventory = await prisma.bloodInventory.findMany({
 ```
 
 ### Find Compatible Donors
+
 ```typescript
 const donors = await prisma.user.findMany({
   where: {
-    role: 'DONOR',
-    bloodGroup: 'O_POSITIVE',
-    city: 'Mumbai',
+    role: "DONOR",
+    bloodGroup: "O_POSITIVE",
+    city: "Mumbai",
     isActive: true,
     isVerified: true,
   },
@@ -273,6 +298,7 @@ const donors = await prisma.user.findMany({
 ```
 
 ### Get User's Donation History
+
 ```typescript
 const donations = await prisma.donation.findMany({
   where: { donorId: userId },
@@ -281,18 +307,20 @@ const donations = await prisma.donation.findMany({
       select: { name: true, city: true },
     },
   },
-  orderBy: { donationDate: 'desc' },
+  orderBy: { donationDate: "desc" },
 });
 ```
 
 ## 🔄 Migration Workflow
 
 ### Development
+
 1. Modify `schema.prisma`
 2. Run `npm run prisma:push` (quick, no migration files)
 3. Test changes
 
 ### Production
+
 1. Modify `schema.prisma`
 2. Run `npm run prisma:migrate` (creates migration files)
 3. Commit migration files
@@ -301,6 +329,7 @@ const donations = await prisma.donation.findMany({
 ## 🐛 Troubleshooting
 
 ### Connection Issues
+
 ```bash
 # Test database connection
 npx prisma db pull
@@ -310,12 +339,14 @@ echo $DATABASE_URL
 ```
 
 ### Reset Database
+
 ```bash
 # ⚠️ WARNING: Deletes all data!
 npx prisma migrate reset
 ```
 
 ### Schema Sync Issues
+
 ```bash
 # Pull current DB schema
 npx prisma db pull

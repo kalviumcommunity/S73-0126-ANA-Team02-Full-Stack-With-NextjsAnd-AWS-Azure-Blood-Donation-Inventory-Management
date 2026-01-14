@@ -3,11 +3,13 @@
 ## 🚀 One-Command Setup (Automated)
 
 ### Windows (PowerShell)
+
 ```powershell
 .\scripts\setup-database.ps1
 ```
 
 ### Mac/Linux
+
 ```bash
 chmod +x scripts/setup-database.sh
 ./scripts/setup-database.sh
@@ -18,6 +20,7 @@ chmod +x scripts/setup-database.sh
 ## 📋 Manual Setup Commands
 
 ### 1. Environment Setup
+
 ```bash
 # Copy example environment file
 cp .env.example .env
@@ -27,16 +30,19 @@ cp .env.example .env
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Generate Prisma Client
+
 ```bash
 npm run prisma:generate
 ```
 
 ### 4. Create Database Tables
+
 ```bash
 # Option A: Quick push (development)
 npm run prisma:push
@@ -46,11 +52,13 @@ npx prisma migrate dev --name init
 ```
 
 ### 5. Seed Sample Data
+
 ```bash
 npm run prisma:seed
 ```
 
 ### 6. Verify Setup
+
 ```bash
 # Open Prisma Studio GUI
 npm run prisma:studio
@@ -68,22 +76,25 @@ npm run prisma:studio
 ## 🔧 Common Prisma Commands
 
 ### Database Operations
-| Command | Description |
-|---------|-------------|
-| `npm run prisma:generate` | Generate Prisma Client |
-| `npm run prisma:push` | Push schema to DB (no migration) |
-| `npm run prisma:migrate` | Create migration |
-| `npm run prisma:studio` | Open database GUI |
-| `npm run prisma:seed` | Populate sample data |
+
+| Command                   | Description                      |
+| ------------------------- | -------------------------------- |
+| `npm run prisma:generate` | Generate Prisma Client           |
+| `npm run prisma:push`     | Push schema to DB (no migration) |
+| `npm run prisma:migrate`  | Create migration                 |
+| `npm run prisma:studio`   | Open database GUI                |
+| `npm run prisma:seed`     | Populate sample data             |
 
 ### Schema Management
-| Command | Description |
-|---------|-------------|
-| `npx prisma format` | Format schema file |
-| `npx prisma validate` | Validate schema |
-| `npx prisma db pull` | Pull schema from DB |
+
+| Command               | Description         |
+| --------------------- | ------------------- |
+| `npx prisma format`   | Format schema file  |
+| `npx prisma validate` | Validate schema     |
+| `npx prisma db pull`  | Pull schema from DB |
 
 ### Database Reset (⚠️ Deletes Data!)
+
 ```bash
 npx prisma migrate reset
 ```
@@ -93,23 +104,27 @@ npx prisma migrate reset
 ## 🔍 Verification Commands
 
 ### Check Database Connection
+
 ```bash
 npx prisma db pull
 ```
 
 ### View Database Version
+
 ```bash
 psql -U postgres -c "SELECT version();"
 ```
 
 ### List All Tables
+
 ```bash
 psql -U postgres -d blood_bank_db -c "\dt"
 ```
 
 ### Count Records
+
 ```bash
-psql -U postgres -d blood_bank_db -c "SELECT 
+psql -U postgres -d blood_bank_db -c "SELECT
   (SELECT COUNT(*) FROM users) as users,
   (SELECT COUNT(*) FROM blood_banks) as blood_banks,
   (SELECT COUNT(*) FROM hospitals) as hospitals,
@@ -123,14 +138,14 @@ psql -U postgres -d blood_bank_db -c "SELECT
 
 After seeding, you'll have:
 
-| Entity | Count | Details |
-|--------|-------|---------|
-| **Users** | 3 | 1 Admin, 2 Donors |
-| **Blood Banks** | 2 | Mumbai & Delhi |
-| **Hospitals** | 1 | Mumbai |
-| **Inventory** | 16 | 8 blood groups × 2 banks |
-| **Donations** | 1 | Sample completed donation |
-| **Campaigns** | 1 | Sample donation drive |
+| Entity          | Count | Details                   |
+| --------------- | ----- | ------------------------- |
+| **Users**       | 3     | 1 Admin, 2 Donors         |
+| **Blood Banks** | 2     | Mumbai & Delhi            |
+| **Hospitals**   | 1     | Mumbai                    |
+| **Inventory**   | 16    | 8 blood groups × 2 banks  |
+| **Donations**   | 1     | Sample completed donation |
+| **Campaigns**   | 1     | Sample donation drive     |
 
 ### Sample Credentials
 
@@ -155,6 +170,7 @@ Donor 2:
 ## 🔧 Troubleshooting Quick Fixes
 
 ### Connection Failed
+
 ```bash
 # Windows - Start PostgreSQL
 net start postgresql-x64-14
@@ -167,6 +183,7 @@ sudo systemctl start postgresql
 ```
 
 ### Database Doesn't Exist
+
 ```bash
 psql -U postgres
 CREATE DATABASE blood_bank_db;
@@ -174,6 +191,7 @@ CREATE DATABASE blood_bank_db;
 ```
 
 ### Permission Denied
+
 ```bash
 psql -U postgres -d blood_bank_db
 GRANT ALL PRIVILEGES ON SCHEMA public TO postgres;
@@ -181,12 +199,14 @@ GRANT ALL PRIVILEGES ON SCHEMA public TO postgres;
 ```
 
 ### Prisma Client Not Found
+
 ```bash
 npm run prisma:generate
 npm install
 ```
 
 ### Port 5432 Already in Use
+
 ```bash
 # Find process using port 5432
 # Windows:
